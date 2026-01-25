@@ -39,8 +39,8 @@ const ReportCard = ({ id, name, size, type, date, color }: ReportCardProps) => {
 
       </div>
 
-      <Link href={`/reports/${id}`}  role="button">
-        <InteractiveHoverButton className="shadow-lg shadow-primary/20 w-full hover:shadow-xl hover:shadow-primary/30 transition-all duration-300">
+      <Link href={`/reports/${id}`}  role="button" aria-label={`Open report ${name}`}>
+        <InteractiveHoverButton  className="shadow-lg shadow-primary/20 w-full hover:shadow-xl hover:shadow-primary/30 transition-all duration-300">
           Open
         </InteractiveHoverButton>
       </Link>

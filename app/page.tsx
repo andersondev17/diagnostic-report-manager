@@ -1,8 +1,8 @@
 import { SkeletonCard } from "@/components/feedback/SkeletonCard"
 import { SkeletonTable } from "@/components/feedback/SkeletonTable"
-import CTA from "@/features/reports/components/CTA"
 import ReportCard from "@/features/reports/components/ReportCard"
 import ReportTable from "@/features/reports/components/ReportTable"
+import CTA from "@/features/upload/CTA"
 import { getAllReports } from "@/lib/actions/report.actions"
 import { getReportColor } from "@/lib/utils"
 import { Suspense } from "react"
@@ -15,24 +15,24 @@ export default async function Page() {
     <main>
       <section className="home-section ">
         <Suspense fallback={<SkeletonCard />}>
-          <div className="flex gap-6 w-full">
             {reports.map((report: TReport) => (
-              <div key={report.id} className="flex-1">
+              <div key={report.id} className="flex-1 w-full">
                 <ReportCard
                   {...report}
                   color={getReportColor(report.type)}
                 />
               </div>
             ))}
-          </div>
         </Suspense>
 
       </section>
       <section className="home-section">
         <Suspense fallback={<SkeletonTable />}>
-          <ReportTable title="Recent Reports" reports={reports} classNames="w-2/3 max-lg:w-full" />
+          <ReportTable title="Recent Reports" reports={reports} classNames="w-2/3 max-lg:w-full border border-primary/20" />
         </Suspense>
+        <Suspense fallback={<SkeletonCard />}>
         <CTA />
+        </Suspense>
       </section>
     </main>
 

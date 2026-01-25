@@ -2,6 +2,7 @@ import { PaginationControls } from "@/components/ui/PaginationControls";
 import ReportTable from "@/features/reports/components/ReportTable";
 import SearchInput from "@/features/reports/components/SearchInput";
 import { getAllReports } from "@/lib/actions/report.actions";
+import Link from "next/link";
 
 const ReportsPage = async ({ searchParams }: SearchParams) => {
   // Extraemos filtros desde searchParams
@@ -17,7 +18,7 @@ const ReportsPage = async ({ searchParams }: SearchParams) => {
     name,
     type,
     status,
-    limit: 20,
+    limit:10,
     page
   });
 
@@ -27,8 +28,16 @@ const ReportsPage = async ({ searchParams }: SearchParams) => {
   return (
     <main className="min-h-screen">
 
-      <section className="flex justify-between gap-4 max-sm:flex-col px-6 py-4 sticky top-16 bg-background z-10 border-b">
-        <div className="flex gap-4 items-center">
+      <article className="mt-2 ">
+        <div className="flex items-center gap-2 mb-2 text-sm text-gray-600 dark:text-gray-400">
+          <Link href="/" className="hover:underline">Home</Link>
+          <span>›</span>
+          <span className="font-medium text-gray-900 dark:text-white">Reports</span>
+        </div>
+      </article>
+
+      <section className="flex justify-between gap-4 max-sm:flex-col py-2 bg-background z-10 ">
+        <div className="flex gap-4 items-center px-2">
           <SearchInput />
         </div>
 
@@ -49,13 +58,10 @@ const ReportsPage = async ({ searchParams }: SearchParams) => {
       )}
 
       {hasResults && (
-        <section className="px-6 py-8">
+        <section className="py-8">
           <ReportTable
             title={hasFilters ? "Filtered Reports" : "Recent Reports"}
             reports={reports}
-            pagination={pagination}
-
-
             classNames="w-full max-lg:w-full"
           />
           <PaginationControls page={pagination.page} totalPages={pagination.totalPages} name={name} type={type} status={status} />

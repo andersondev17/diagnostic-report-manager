@@ -17,6 +17,7 @@ enum ReportStatus {
   Completed = 'COMPLETED',
   Failed = 'FAILED'
 }
+
 type TReport = Models.DocumentList<Models.Document> & {
   id: string;
   name: string;
@@ -96,4 +97,23 @@ interface ReportComponentProps {
   status?: ReportStatus;
   createdAt?: string;
   updatedAt?: string;
+}
+
+interface DataTableColumn<T> {
+  header: string;
+  cell: (item: T, index: number) => React.ReactNode;
+  cellClassName?: string;
+  headClassName?: string;
+}
+
+interface DataTableProps<T> {
+  columns: DataTableColumn<T>[];
+  data: T[];
+  rowKey: (item: T, index: number) => string | number;
+  onRowClick?: (item: T) => void;
+  onRowKeyDown?: (e: React.KeyboardEvent<HTMLTableRowElement>, item: T) => void;
+  tableClassName?: string;
+  headerRowClassName?: string;
+  bodyRowClassName?: string;
+  enableKeyboardNav?: boolean;
 }

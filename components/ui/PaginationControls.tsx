@@ -24,9 +24,9 @@ export const PaginationControls = ({ page, totalPages, name, type, status }: Pag
     };
 
     return (
-        <div className="flex justify-center gap-4 mt-6">
+        <section className="flex justify-center gap-4 mt-6 sticky bottom-2 bg-accent">
             <button
-                className="px-3 py-1 border rounded disabled:opacity-50"
+                className="px-3 py-1 border rounded disabled:opacity-50 hover:bg-primary hover:text-white"
                 disabled={page <= 1}
                 onClick={() => handlePageChange(page - 1)}
             >
@@ -38,12 +38,12 @@ export const PaginationControls = ({ page, totalPages, name, type, status }: Pag
             </span>
 
             <button
-                className="px-3 py-1 border rounded disabled:opacity-50"
+                className="px-3 py-1 border rounded disabled:opacity-50 hover:bg-primary hover:text-white"
                 disabled={page >= totalPages}
                 onClick={() => handlePageChange(page + 1)}
             >
                 Next
             </button>
-        </div>
+        </section>
     );
 };

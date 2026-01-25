@@ -19,9 +19,8 @@ const ReportCard = ({ id, name, size, type, date, color }: ReportCardProps) => {
         type="chars"
         trigger="load"
         stagger={0.06}
-        duration={0.7}
+        duration={0.2}
         ease="back.out(1.4)"
-        delay={0.15}
         className="text-lg font-medium"
       >
 

@@ -15,6 +15,10 @@ export const Dropzone = ({ onDrop, acceptedTypes, supportedTypesLabel = 'PDF, CS
     // StrategyManager aquí
     const strategyManager = useMemo(() => new UploadStrategyManager(), []);
 
+    const resolvedAcceptedTypes = useMemo(
+        () => acceptedTypes ?? strategyManager.getSupportedMimeTypes(),
+        [acceptedTypes, strategyManager]
+    );
     const handleDrop = (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
         const validFiles: File[] = [];
         const errors: string[] = [];
@@ -27,21 +31,30 @@ export const Dropzone = ({ onDrop, acceptedTypes, supportedTypesLabel = 'PDF, CS
                 validFiles.push(file);
             }
         });
+        rejectedFiles.forEach(rejection => {
+            const { file, errors: dropzoneErrors } = rejection;
+
+            if (dropzoneErrors.some(e => e.code === 'file-invalid-type')) {
+                const supportedTypes = strategyManager.getSupportedExtensions();
+                errors.push(`${file.name}: File type not supported. Only ${supportedTypes} allowed`);
+            } else {
+                errors.push(`${file.name}: ${dropzoneErrors[0]?.message ?? 'Upload failed'}`);
+            }
+        });
         errors.forEach(err => toast.error(err, { duration: 4000 }));
 
-        onDrop(acceptedFiles);
-        validFiles.forEach(file => toast.success(`${file.name} uploaded successfully!`, { duration: 3000 }));
+        onDrop(validFiles);
 
     };
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop: handleDrop,
         multiple: true,
-        accept: acceptedTypes ?? { 'application/pdf': [], 'text/csv': [] },
+        accept: resolvedAcceptedTypes,
     });
 
     return (
-        <div className="flex flex-col items-center" aria-describedby='region' aria-label="File upload zone">
+        <div className="flex flex-col items-center" aria-label="File upload zone">
             <button {...getRootProps()} aria-describedby="dropzone-help" className={`dropzone ${isDragActive ? 'border-blue-400 bg-blue-50' : 'border-gray-300'}`}>
                 <LightRays count={7} color="rgba(160, 210, 255, 0.2)" blur={36} speed={14} length="100%" />
                 <input {...getInputProps()} />

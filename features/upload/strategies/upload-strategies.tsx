@@ -9,7 +9,7 @@ export class PdfUploadStrategy implements UploadStrategy {
     }
 
     getIcon(size = 24) {
-        return <IconFile size={ size } className = "text-red-500" />;
+        return <IconFile size={ size } className = "text-red-700" />;
     }
 
     validate(file: File): string | null {
@@ -33,7 +33,7 @@ export class CsvUploadStrategy implements UploadStrategy {
     }
 
     getIcon(size = 24) {
-        return <IconFileTypeCsv size={ size } className = "text-green-600" />;
+        return <IconFileTypeCsv size={ size } className = "text-green-700" />;
     }
 
     validate(file: File): string | null {

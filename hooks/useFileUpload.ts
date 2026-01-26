@@ -1,6 +1,7 @@
 import { useReportsStore } from '@/lib/store/reports-store';
 import { UploadFile, UploadStatus } from '@/types/upload';
 import { useCallback, useEffect, useRef } from 'react';
+import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
 
 interface UploadTimers {
@@ -55,6 +56,7 @@ export const useFileUpload = () => {
                 return;
             }
             clearInterval(interval);
+            toast.success(`${file.name} uploaded successfully!`, { duration: 3000 });
             const finalStatus = Math.random() < 0.1 ? UploadStatus.ERROR : UploadStatus.SUCCESS;
             updateReport(id, { status: finalStatus, progress: 100 });
             uploadTimersRef.current.delete(id);
@@ -80,7 +82,7 @@ export const useFileUpload = () => {
     const retry = useCallback((id: string) => {
         const report = getReportById(id);
         if (!report?.file) return;
-        
+
         const timers = uploadTimersRef.current.get(id);
         if (timers) {
             clearInterval(timers.interval);

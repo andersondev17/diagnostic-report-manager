@@ -17,10 +17,16 @@ export class UploadStrategyManager {
     getStrategy(file: File): UploadStrategy | null {
         return this.strategies.find(s => s.supports(file)) ?? null;
     }
+    getSupportedExtensions() {
+        return this.strategies
+            .flatMap(s => s.getMimeTypes())
+            .map(mime => mime.split('/')[1]?.toUpperCase())
+            .join(', ');
+    }
 
     validate(file: File): string | null {
         const strategy = this.getStrategy(file);
-        if (!strategy) return 'File type not supported. Only PDF and CSV allowed';
+        if (!strategy) return `File type not supported. Only ${this.getSupportedExtensions()} allowed`;
         return strategy.validate(file);
     }
 

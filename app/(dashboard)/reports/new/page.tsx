@@ -73,7 +73,7 @@ const UploadPage = () => {
     )
 
   }
-  ], [retry, remove]);
+  ], [retry, remove,strategyManager]);
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6">

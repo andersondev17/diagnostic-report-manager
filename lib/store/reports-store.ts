@@ -19,7 +19,7 @@ interface ReportsState {
     removeReport: (id: string) => void;
     setReports: (reports: UploadFile[]) => void;
 
-    // Utility operations
+    // Utility operations    
     clearCompleted: () => void;
     getReportById: (id: string) => UploadFile | undefined;
     getReportsByStatus: (status: UploadStatus) => UploadFile[];
@@ -32,7 +32,6 @@ export const useReportsStore = create<ReportsState>()(
                 reports: [],
                 operations: [],
 
-                // Add multiple reports (bulk upload support)
                 addReports: (newReports) => set((state) => {
                     const timestamp = Date.now();
                     const operations = newReports.map(r => ({
@@ -44,25 +43,29 @@ export const useReportsStore = create<ReportsState>()(
 
                     return {
                         reports: [...newReports, ...state.reports],
-                        //  last 100 operations for audit 
                         operations: [...operations, ...state.operations].slice(0, 100),
                     };
                 }),
 
-                updateReport: (id, update) => set((state) => ({
-                    reports: state.reports.map(r =>
-                        r.id === id ? { ...r, ...update } : r
-                    ),
-                    operations: [
-                        {
-                            id,
-                            type: 'UPDATE' as const,
-                            status: update.status ?? UploadStatus.LOADING,
-                            timestamp: Date.now(),
-                        },
-                        ...state.operations,
-                    ].slice(0, 100),
-                })),
+                updateReport: (id, update) => set((state) => {
+                    const existing = state.reports.find(r => r.id === id);
+                    const operationStatus = update.status ?? existing?.status ?? UploadStatus.LOADING;
+
+                    return {
+                        reports: state.reports.map(r =>
+                            r.id === id ? { ...r, ...update } : r
+                        ),
+                        operations: [
+                            {
+                                id,
+                                type: 'UPDATE' as const,
+                                status: operationStatus,
+                                timestamp: Date.now(),
+                            },
+                            ...state.operations,
+                        ].slice(0, 100),
+                    };
+                }),
 
                 removeReport: (id) => set((state) => ({
                     reports: state.reports.filter(r => r.id !== id),
@@ -77,7 +80,6 @@ export const useReportsStore = create<ReportsState>()(
                     ].slice(0, 100),
                 })),
 
-                // Replace entire reports array (for hydration/sync)
                 setReports: (reports) => set({ reports }),
 
                 clearCompleted: () => set((state) => ({
@@ -90,7 +92,6 @@ export const useReportsStore = create<ReportsState>()(
             }),
             {
                 name: 'reports-storage',
-                // Only persist reports
                 partialize: (state) => ({
                     reports: state.reports.map(r => ({
                         id: r.id,
@@ -101,8 +102,6 @@ export const useReportsStore = create<ReportsState>()(
                         size: r.file?.size ?? r.size,
                     })),
                 }),
-
-
             }
         ),
         { name: 'ReportsStore' }

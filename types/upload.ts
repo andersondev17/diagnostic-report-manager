@@ -21,14 +21,10 @@ export interface UploadColumn<T = UploadFile> {
     cellClassName?: string;
 }
 
-export type UploadFileState = {
-    id: string;
-    file?: File;
+export type UploadFileState = UploadFile & {
     name: string;
     type: string;
     size: number;
-    status: UploadStatus;
-    progress: number;
 };
 export interface ReportsState {
     reports: UploadFileState[];

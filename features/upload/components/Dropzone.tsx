@@ -32,6 +32,7 @@ export const Dropzone = ({ onDrop }: Props) => {
             <button
                 {...getRootProps()}
                 aria-label="File upload Dropzone"
+                aria-describedby={errorMessage ? 'error-message' : undefined}
                 className={`dropzone ${isDragActive ? 'border-blue-400 bg-blue-50' : 'border-gray-300'
                     }`}
             >
@@ -51,7 +52,9 @@ export const Dropzone = ({ onDrop }: Props) => {
 
             {/* Feedback de error */}
             {errorMessage && (
-                <p  aria-describedby="error-message" className="mt-2 text-sm text-red-600 text-center">{errorMessage}</p>
+                <p id="error-message" role="alert" aria-live="polite" className="mt-2 text-sm text-red-600 text-center">
+                    {errorMessage}
+                </p>
             )}
         </div>
     );

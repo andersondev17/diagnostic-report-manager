@@ -17,7 +17,7 @@ const UploadListComponent = ({ files, onRetry, onRemove, columns }: UploadListPr
             <div className="space-y-2 mt-4 ">
                 {files.map(file => (
                     <div key={file.id}>
-                        {file.file!.name} {/* fallback  */}
+                        {file.file?.name ?? file.name ?? 'Unknown file'}
                     </div>
                 ))}
             </div>
@@ -25,7 +25,7 @@ const UploadListComponent = ({ files, onRetry, onRemove, columns }: UploadListPr
     }
 
     return (
-        <div className="space-y-2 mt-4" aria-label="Upload list">
+        <ul className="space-y-2 mt-4" aria-label="Upload list">
             {files.map(file => (
                 <li
                     key={file.id}
@@ -44,7 +44,7 @@ const UploadListComponent = ({ files, onRetry, onRemove, columns }: UploadListPr
                     </div>
                 </li>
             ))}
-        </div>
+        </ul>
     );
 };
 export const UploadList = memo(UploadListComponent);

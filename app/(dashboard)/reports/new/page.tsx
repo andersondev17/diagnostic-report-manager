@@ -2,11 +2,11 @@
 import { SkeletonCard } from "@/components/feedback/SkeletonCard";
 import { Dropzone } from "@/features/upload/components/Dropzone";
 import { UploadList } from "@/features/upload/components/UploadList";
-import { UploadStatus, useFileUpload } from "@/hooks/useFileUpload";
-import { UploadColumn } from "@/types/upload";
+import { useFileUpload } from "@/hooks/useFileUpload";
+import { UploadColumn, UploadStatus } from "@/types/upload";
 import { IconFileText } from "@tabler/icons-react";
 import Link from "next/link";
-import { Suspense, useCallback } from 'react';
+import { Suspense, useCallback, useMemo } from 'react';
 
 const UploadPage = () => {
   const { files, simulateUpload, remove, retry } = useFileUpload();
@@ -15,37 +15,38 @@ const UploadPage = () => {
     acceptedFiles.forEach(simulateUpload);
   }, [simulateUpload]);
 
-  const uploadColumns: UploadColumn[] = [
-    {
-      cell: (file) => <IconFileText size={24} className="text-primary" />
-    },
-    {
-      cell: (file) => (
-        <div className="flex-1 min-w-0">
-          <p className="font-bold">{file.file.name}</p>
-          <p className="text-sm text-gray-500">{(file.file.size / 1024).toFixed(1)} KB</p>
-          {file.status === UploadStatus.LOADING && (
-            <div className="mt-1 w-full h-1 bg-gray-200 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-green-500 transition-all duration-300"
-                style={{ width: `${file.progress}%` }}
-              />
-            </div>
-          )}
-        </div>
-      )
-    },
-    {
-      cell: (file) => (
-        <div className="flex gap-2">
-          {file.status === UploadStatus.ERROR && (
-            <button onClick={() => retry(file.id)} className="text-xs text-blue-600 hover:underline">Retry</button>
-          )}
-          <button onClick={() => remove(file.id)} className="text-xs text-gray-500 hover:underline right-1">×</button>
-        </div>
-      )
-    }
-  ];
+  const uploadColumns = useMemo<UploadColumn[]>(() => [{
+    cell: (file) => <IconFileText size={24} className="text-primary" />
+  },
+  {
+    cell: (file) => (
+      <div className="flex-1 min-w-0">
+        <p className="font-bold">{file.file?.name ?? file.name}</p>
+        <p className="text-sm text-gray-500">
+          {file.file?.size ? (file.file.size / 1024).toFixed(1) : (file.size ? (file.size / 1024).toFixed(1) : '–')} KB
+        </p>
+        {file.status === UploadStatus.LOADING && (
+          <div className="mt-1 w-full h-1 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-green-500 transition-all duration-300"
+              style={{ width: `${file.progress}%` }}
+            />
+          </div>
+        )}
+      </div>
+    )
+  }   ,
+  {
+    cell: (file) => (
+      <div className="flex gap-2">
+        {file.status === UploadStatus.ERROR && (
+          <button onClick={() => retry(file.id)} className="text-xs text-blue-600 hover:underline">Retry</button>
+        )}
+        <button onClick={() => remove(file.id)} className="text-xs text-gray-500 hover:underline right-1">×</button>
+      </div>
+    )
+  }
+  ], [retry, remove]);
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6">
@@ -62,10 +63,27 @@ const UploadPage = () => {
           <Dropzone onDrop={handleDrop} />
         </Suspense>
 
-        <div className="flex justify-center items-center">
-          <div className="relative h-[450px] w-full overflow-y-auto rounded-xl ">
-            <Suspense fallback={<div className="text-center text-gray-500">Upload List will appear here...</div>}>
-              <UploadList files={files} onRetry={retry} onRemove={remove} columns={uploadColumns} />
+        <div className="flex justify-center items-start">
+          <div className="relative h-[450px] w-full overflow-y-auto rounded-xl dark:border-gray-700 p-4">
+            <Suspense fallback={
+              <div className="text-center text-gray-500">
+                Upload List will appear here...
+              </div>
+            }>
+              {files.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                  <IconFileText size={48} className="mb-4 opacity-50" />
+                  <p>No uploads yet</p>
+                  <p className="text-sm">Drop files to get started</p>
+                </div>
+              ) : (
+                <UploadList
+                  files={files}
+                  onRetry={retry}
+                  onRemove={remove}
+                  columns={uploadColumns}
+                />
+              )}
             </Suspense>
           </div>
         </div>

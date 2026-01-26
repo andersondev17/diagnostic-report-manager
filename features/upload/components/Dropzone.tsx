@@ -28,7 +28,7 @@ export const Dropzone = ({ onDrop }: Props) => {
     });
 
     return (
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center" role="region" aria-label="File upload Dropzone">
             <button
                 {...getRootProps()}
                 aria-label="File upload Dropzone"

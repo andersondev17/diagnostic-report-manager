@@ -1,4 +1,5 @@
 import { UploadColumn, UploadFile } from '@/types/upload';
+import { memo } from 'react';
 
 type UploadListProps = {
     files: UploadFile[];
@@ -7,7 +8,7 @@ type UploadListProps = {
     columns?: UploadColumn[];
 };
 
-export const UploadList = ({ files, onRetry, onRemove, columns }: UploadListProps) => {
+const UploadListComponent = ({ files, onRetry, onRemove, columns }: UploadListProps) => {
     if (files.length === 0) return null;
 
     // Si no hay columnas definidas, usamos la versión clásica
@@ -16,7 +17,7 @@ export const UploadList = ({ files, onRetry, onRemove, columns }: UploadListProp
             <div className="space-y-2 mt-4 ">
                 {files.map(file => (
                     <div key={file.id}>
-                        {file.file.name} {/* fallback  */}
+                        {file.file!.name} {/* fallback  */}
                     </div>
                 ))}
             </div>
@@ -24,11 +25,12 @@ export const UploadList = ({ files, onRetry, onRemove, columns }: UploadListProp
     }
 
     return (
-        <div className="space-y-2 mt-4">
+        <div className="space-y-2 mt-4" aria-label="Upload list">
             {files.map(file => (
-                <div
+                <li
                     key={file.id}
                     className="flex items-center justify-between gap-4 border p-3 rounded-lg"
+                    aria-label={`File ${file.file?.name ?? file.name}, status ${file.status}`}
                 >
                     {/* Izquierda: icono + info */}
                     <div className="flex items-center gap-4">
@@ -40,8 +42,9 @@ export const UploadList = ({ files, onRetry, onRemove, columns }: UploadListProp
                     <div className="flex items-center gap-2">
                         {columns[2]?.cell(file)}
                     </div>
-                </div>
+                </li>
             ))}
         </div>
     );
 };
+export const UploadList = memo(UploadListComponent);

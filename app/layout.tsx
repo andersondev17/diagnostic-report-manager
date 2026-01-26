@@ -1,6 +1,7 @@
 import { ErrorBoundary } from "@/components/feedback/ErrorBoundary";
 import { AppSidebar } from "@/components/layout/AppSidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import { Toaster } from "@/components/ui/sonner";
 import { SiteHeader } from "@/features/navbar/components/SiteHeader";
 import type { Metadata } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
@@ -35,6 +36,7 @@ export default function RootLayout({
           >
             <AppSidebar variant="inset" />
             <SidebarInset>
+              <Toaster />
               <SiteHeader />
               {children}
             </SidebarInset>

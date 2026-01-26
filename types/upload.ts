@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export enum UploadStatus {
     LOADING = 'LOADING',
     SUCCESS = 'SUCCESS',
@@ -33,4 +35,11 @@ export interface ReportsState {
     updateReport: (id: string, update: Partial<UploadFileState>) => void;
     removeReport: (id: string) => void;
     clearCompleted: () => void;
+}
+
+export interface UploadStrategy {
+    supports(file: File): boolean;
+    getIcon(size?: number): ReactNode;
+    validate(file: File): string | null;
+    getMimeTypes(): string[];
 }

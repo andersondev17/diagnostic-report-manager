@@ -2,6 +2,7 @@
 import { SkeletonCard } from "@/components/feedback/SkeletonCard";
 import { Dropzone } from "@/features/upload/components/Dropzone";
 import { UploadList } from "@/features/upload/components/UploadList";
+import { UploadStrategyManager } from "@/features/upload/strategies/upload-manager";
 import { useFileUpload } from "@/hooks/useFileUpload";
 import { UploadColumn, UploadStatus } from "@/types/upload";
 import { IconFileText } from "@tabler/icons-react";
@@ -10,13 +11,22 @@ import { Suspense, useCallback, useMemo } from 'react';
 
 const UploadPage = () => {
   const { files, simulateUpload, remove, retry } = useFileUpload();
+  const strategyManager = useMemo(() => new UploadStrategyManager(), []);
 
   const handleDrop = useCallback((acceptedFiles: File[]) => {
     acceptedFiles.forEach(simulateUpload);
   }, [simulateUpload]);
 
   const uploadColumns = useMemo<UploadColumn[]>(() => [{
-    cell: (file) => <IconFileText size={24} className="text-primary" />
+    cell: (file) => {
+      if (!file.file) {
+        return <IconFileText size={24} className="text-gray-400" />;
+      }
+
+      return strategyManager.getIcon(file.file, 24) ?? (
+        <IconFileText size={24} className="text-gray-400" />
+      );
+    }
   },
   {
     cell: (file) => (
@@ -26,7 +36,11 @@ const UploadPage = () => {
           {file.file?.size ? (file.file.size / 1024).toFixed(1) : (file.size ? (file.size / 1024).toFixed(1) : '–')} KB
         </p>
         {file.status === UploadStatus.LOADING && (
-          <div className="mt-1 w-full h-1 bg-gray-200 rounded-full overflow-hidden">
+          <div
+            className="mt-1 w-full h-1 bg-gray-200 rounded-full overflow-hidden"
+            aria-valuenow={file.progress}
+            aria-label={`Upload progress: ${file.progress}%`}
+          >
             <div
               className="h-full bg-green-500 transition-all duration-300"
               style={{ width: `${file.progress}%` }}
@@ -35,18 +49,31 @@ const UploadPage = () => {
         )}
       </div>
     )
-  }   ,
+  },
   {
     cell: (file) => (
-      <div className="flex gap-2">
+      <div className="flex gap-2 items-center">
         {file.status === UploadStatus.ERROR && (
-          <button onClick={() => retry(file.id)} className="text-xs text-blue-600 hover:underline">Retry</button>
+          <button
+            onClick={() => retry(file.id)}
+            className="text-xs text-blue-600 hover:underline"
+            aria-label={`Retry upload for ${file.name}`}
+          >
+            Retry
+          </button>
         )}
-        <button onClick={() => remove(file.id)} className="text-xs text-gray-500 hover:underline right-1">×</button>
+        <button
+          onClick={() => remove(file.id)}
+          className="text-xs text-gray-500 hover:underline right-1"
+          aria-label={`Remove ${file.name}`}
+        >
+          ×
+        </button>
       </div>
     )
+
   }
-  ], [retry, remove]);
+  ], [retry, remove,strategyManager]);
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6">

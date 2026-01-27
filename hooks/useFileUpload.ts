@@ -83,7 +83,7 @@ export const useFileUpload = () => {
         }, 2000);
 
         uploadTimersRef.current.set(id, { interval, timeout });
-    }, [addReports, updateReport]);
+    }, [addReports, updateReport, reports.length]);
 
     const simulateUpload = useCallback((file: File) => {
         simulateUploadWithId(file);

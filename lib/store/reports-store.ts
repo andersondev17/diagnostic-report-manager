@@ -95,11 +95,10 @@ export const useReportsStore = create<ReportsState>()(
         name: 'reports-storage',
         partialize: (state) => ({
           reports: state.reports,
-          isHydrated: state.isHydrated,
         }),
         onRehydrateStorage: () => (state) => {
           //  Inicializa con el mock si no hay datos
-          if (state && !state.isHydrated) {
+          if (state) {
             if (!state.reports || state.reports.length === 0) {
               state.setReports(INITIAL_MOCK);
             }

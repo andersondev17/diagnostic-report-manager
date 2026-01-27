@@ -1,6 +1,6 @@
 'use server';
 
-import { recentReports } from "../db/mock-data";
+import { INITIAL_MOCK } from "../db/mock-data";
 
 
 export const getAllReports = async ({
@@ -10,7 +10,7 @@ export const getAllReports = async ({
     type = '',
     status = '',
 }: GetAllReportsParams): Promise<PaginatedReports> => {
-    let filtered = recentReports;
+    let filtered = INITIAL_MOCK;
 
     const filters = [
         { condition: name, fn: (r: TReport) => r.name.toLowerCase().includes(name.toLowerCase()) },
@@ -40,12 +40,5 @@ export const getAllReports = async ({
 };
 
 export const getReport = async (id: string): Promise<TReport | null> => {
-    // Convertir id a número para coincidir con los datos mock
-    const numericId = Number(id);
-    if (isNaN(numericId)) return null;
-
-    // Buscar por id numérico
-    const report = recentReports.find(r => r.id === numericId);
-
-    return report ?? null;
+    return INITIAL_MOCK.find(r => r.id === id) ?? null;
 };

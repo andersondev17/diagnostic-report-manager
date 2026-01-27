@@ -4,18 +4,10 @@
 //   image?: string;
 //   accountId: string;
 // };
-
-enum ReportType {
-  Vibration = "Vibration",
-  Thermal = "Thermal",
-  Acoustic = "Acoustic",
-  Electrical = "Electrical"
-}
 enum ReportStatus {
-  Pending = 'PENDING',
-  InProgress = 'IN_PROGRESS',
-  Completed = 'COMPLETED',
-  Failed = 'FAILED'
+  LOADING = 'LOADING',
+  SUCCESS = 'SUCCESS',
+  ERROR = 'ERROR',
 }
 
 type TReport = Models.DocumentList<Models.Document> & {

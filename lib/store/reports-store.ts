@@ -20,6 +20,7 @@ interface ReportsState {
     updateReport: (id: string, update: Partial<UploadFile>) => void;
     removeReport: (id: string) => void;
     setReports: (reports: UploadFile[]) => void;
+    setHydrated: (value: boolean) => void;
 
     // Utility operations    
     clearCompleted: () => void;
@@ -79,6 +80,7 @@ export const useReportsStore = create<ReportsState>()(
           })),
 
         setReports: (reports) => set({ reports }),
+        setHydrated: (value) => set({ isHydrated: value }),
 
         clearCompleted: () =>
           set((state) => ({
@@ -99,9 +101,9 @@ export const useReportsStore = create<ReportsState>()(
           //  Inicializa con el mock si no hay datos
           if (state && !state.isHydrated) {
             if (!state.reports || state.reports.length === 0) {
-              state.reports = INITIAL_MOCK;
+              state.setReports(INITIAL_MOCK);
             }
-            state.isHydrated = true;
+            state.setHydrated(true);
           }
         },
       }

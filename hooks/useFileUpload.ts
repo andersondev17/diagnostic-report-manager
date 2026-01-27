@@ -15,6 +15,7 @@ export const useFileUpload = () => {
     const strategyManager = new UploadStrategyManager();
     const isMounted = useRef(true);
     const uploadTimersRef = useRef<Map<string, UploadTimers>>(new Map());
+    const MAX_FILES_PER_DROP = 10;
 
     useEffect(() => {
         isMounted.current = true;
@@ -30,6 +31,11 @@ export const useFileUpload = () => {
 
 
     const simulateUploadWithId = useCallback((file: File, existingId?: string) => {
+        if (!existingId && reports.length >= MAX_FILES_PER_DROP) {
+            toast.error(`You can upload a maximum of ${MAX_FILES_PER_DROP} files at a time.`);
+            return;
+        }
+
         const error = strategyManager.validate(file);
         if (error) {
             toast.error(error);

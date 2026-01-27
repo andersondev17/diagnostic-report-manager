@@ -1,5 +1,6 @@
+import { UploadStrategyManager } from '@/features/upload/strategies/upload-manager';
 import { useReportsStore } from '@/lib/store/reports-store';
-import { UploadFile, UploadStatus } from '@/types/upload';
+import { ReportType, UploadFile, UploadStatus } from '@/types/upload';
 import { useCallback, useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { v4 as uuidv4 } from 'uuid';
@@ -11,6 +12,7 @@ interface UploadTimers {
 
 export const useFileUpload = () => {
     const { reports, addReports, updateReport, removeReport, getReportById } = useReportsStore();
+    const strategyManager = new UploadStrategyManager();
     const isMounted = useRef(true);
     const uploadTimersRef = useRef<Map<string, UploadTimers>>(new Map());
 
@@ -26,14 +28,26 @@ export const useFileUpload = () => {
         };
     }, []);
 
-    const isValidFile = (file: File) => ['application/pdf', 'text/csv'].includes(file.type);
 
     const simulateUploadWithId = useCallback((file: File, existingId?: string) => {
-        if (!isValidFile(file)) return;
+        const error = strategyManager.validate(file);
+        if (error) {
+            toast.error(error);
+            return;
+        }
 
         const id = existingId ?? uuidv4();
-        const newFile: UploadFile = { id, file, status: UploadStatus.LOADING, progress: 0 };
-        
+
+        const newFile: UploadFile = {
+            id,
+            file,
+            status: UploadStatus.LOADING,
+            progress: 0,
+            name: file.name,
+            size: file.size,
+            type: file.type as ReportType,
+            date: new Date().toISOString().split('T')[0]
+        };
         if (!existingId) {
             addReports([newFile]);
         } else {

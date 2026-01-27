@@ -6,14 +6,18 @@ export enum UploadStatus {
     ERROR = 'ERROR',
 }
 
+export enum ReportType {
+    PDF = "application/pdf",
+    CSV = "text/csv",
+}
 export type UploadFile = {
   id: string;
   file?: File;
   status: UploadStatus;
-  progress: number;
+  progress?: number;
   name?: string;
   size?: number;
-  type?: string;
+  type?: ReportType;
   date?: string;
 };
 

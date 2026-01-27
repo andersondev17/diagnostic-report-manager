@@ -1,11 +1,11 @@
-import { UploadStrategy } from '@/types/upload';
+import { ReportType, UploadStrategy } from '@/types/upload';
 import { IconFile, IconFileTypeCsv } from '@tabler/icons-react';
 
 export class PdfUploadStrategy implements UploadStrategy {
     private readonly MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 
     supports(file: File): boolean {
-        return file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+        return file.type === ReportType.PDF;
     }
 
     getIcon(size = 24) {
@@ -29,7 +29,7 @@ export class CsvUploadStrategy implements UploadStrategy {
     private readonly MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
 
     supports(file: File): boolean {
-        return file.type === 'text/csv' || file.name.toLowerCase().endsWith('.csv');
+        return file.type === ReportType.CSV;
     }
 
     getIcon(size = 24) {

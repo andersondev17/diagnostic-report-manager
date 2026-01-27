@@ -11,7 +11,6 @@ A modern, React application to manage and view diagnostic reports.
 - [Usage](#usage)  
 - [Technical Notes](#technical-notes)  
 - [Patterns & Best Practices](#patterns--best-practices)  
-- [Testing](#testing)  
 - [Future Improvements](#future-improvements)  
 
 ---
@@ -118,7 +117,7 @@ Our frontend architecture is designed to handle large file uploads gracefully:
 - **Performance-optimized:** Components use memoization and prevent unnecessary re-renders
 - **Accessible feedback:** Upload progress, errors, and completion status can be made perceivable via ARIA live regions for screen readers
 
-> This frontend is ready to integrate with any backend upload strategy (chunked, resumable, streaming) without requiring component rewrites. The separation of concerns ensures scalability and maintainability.
+> The `ReportsPage` table uses SSR to render the initial data source from `lib/db/mock-data.ts`. Any new uploads are handled entirely on the client in [`/reports/new`](http://localhost:3000/reports/new), complete with progress indicators, error handling, and retry options. In the future, the table could be enhanced to automatically include new uploads from the client without affecting performance.
 
 ## Installation
 

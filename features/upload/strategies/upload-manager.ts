@@ -2,9 +2,12 @@ import { UploadStrategy } from '@/types/upload';
 import { CsvUploadStrategy, PdfUploadStrategy } from './upload-strategies';
 
 /**
- * Context -  strategy selection
+ *   Selecciona dinámicamente una implementación concreta.
+ *   El manager desacopla las reglas de validación específicas de cada archivo de la lógica del flujo de carga.
+ *   Agregar un nuevo tipo de archivo implica crear una nueva estrategia, no modificar código existente.
  */
 export class UploadStrategyManager {
+//Cada estrategia encapsula las reglas de validación para un tipo de archivo.
     private strategies: UploadStrategy[];
 
     constructor() {
@@ -14,7 +17,8 @@ export class UploadStrategyManager {
         ];
     }
 
-    getStrategy(file: File): UploadStrategy | null {
+    //expone clases: El sistema pregunta a las estrategias si soportan el archivo
+    getStrategy(file: File): UploadStrategy | null {  //
         return this.strategies.find(s => s.supports(file)) ?? null;
     }
     getSupportedExtensions() {
@@ -24,6 +28,7 @@ export class UploadStrategyManager {
             .join(', ');
     }
 
+    //delega validacion depende de upload-startegies
     validate(file: File): string | null {
         const strategy = this.getStrategy(file);
         if (!strategy) return `File type not supported. Only ${this.getSupportedExtensions()} allowed`;

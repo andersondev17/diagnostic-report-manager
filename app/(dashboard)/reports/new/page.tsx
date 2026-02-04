@@ -3,19 +3,24 @@ import { SkeletonCard } from "@/components/feedback/SkeletonCard";
 import { Dropzone } from "@/features/upload/components/Dropzone";
 import { UploadList } from "@/features/upload/components/UploadList";
 import { UploadStrategyManager } from "@/features/upload/strategies/upload-manager";
-import { useFileUpload } from "@/hooks/useFileUpload";
+import { useUploadFlow } from "@/hooks/useUploadFlow";
 import { UploadColumn, UploadStatus } from "@/types/upload";
 import { IconFileText } from "@tabler/icons-react";
 import Link from "next/link";
-import { Suspense, useCallback, useMemo } from 'react';
+import { Suspense, useMemo } from 'react';
+
+
+/**
+ * This component owns the upload flow from end to end:
+ * - Singleton StrategyManager instance (created once via useMemo)
+ * - Single useUploadFlow call (provides all needed state + callbacks)
+ * - Dropzone receives acceptedTypes for UX validation
+ */
 
 const UploadPage = () => {
-  const { files, simulateUpload, remove, retry } = useFileUpload();
   const strategyManager = useMemo(() => new UploadStrategyManager(), []);
+  const { files, handleDrop, remove, retry } = useUploadFlow(strategyManager);
 
-  const handleDrop = useCallback((acceptedFiles: File[]) => {
-    acceptedFiles.forEach(simulateUpload);
-  }, [simulateUpload]);
 
   const uploadColumns = useMemo<UploadColumn[]>(() => [{
     cell: (file) => {
@@ -29,6 +34,7 @@ const UploadPage = () => {
     }
   },
   {
+    // Column 2: File metadata + progress
     cell: (file) => (
       <div className="flex-1 min-w-0">
         <p className="font-bold">{file.file?.name ?? file.name}</p>
@@ -51,6 +57,7 @@ const UploadPage = () => {
     )
   },
   {
+    // Column 3: Actions
     cell: (file) => (
       <div className="flex gap-2 items-center">
         {file.status === UploadStatus.ERROR && (
@@ -73,7 +80,7 @@ const UploadPage = () => {
     )
 
   }
-  ], [retry, remove,strategyManager]);
+  ], [retry, remove, strategyManager]);
 
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6">
@@ -87,7 +94,11 @@ const UploadPage = () => {
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
 
         <Suspense fallback={<SkeletonCard />}>
-          <Dropzone onDrop={handleDrop} />
+          <Dropzone
+            onDrop={handleDrop}
+            acceptedTypes={strategyManager.getSupportedMimeTypes()}
+            supportedTypesLabel={strategyManager.getSupportedExtensions()}
+          />
         </Suspense>
 
         <div className="flex justify-center items-start">

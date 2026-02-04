@@ -1,9 +1,6 @@
 'use client';
 import { LightRays } from '@/components/ui/light-rays';
-import { useMemo } from 'react';
-import { FileRejection, useDropzone } from 'react-dropzone';
-import { toast } from 'sonner';
-import { UploadStrategyManager } from '../strategies/upload-manager';
+import { useDropzone } from 'react-dropzone';
 
 type Props = {
     onDrop: (files: File[]) => void;
@@ -11,46 +8,24 @@ type Props = {
     supportedTypesLabel?: string;
 };
 
-export const Dropzone = ({ onDrop, acceptedTypes, supportedTypesLabel = 'PDF, CSV' }: Props) => {
-    // StrategyManager aquí
-    const strategyManager = useMemo(() => new UploadStrategyManager(), []);
-
-    const resolvedAcceptedTypes = useMemo(
-        () => acceptedTypes ?? strategyManager.getSupportedMimeTypes(),
-        [acceptedTypes, strategyManager]
-    );
-    const handleDrop = (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
-        const validFiles: File[] = [];
-        const errors: string[] = [];
-
-        acceptedFiles.forEach(file => {
-            const error = strategyManager.validate(file);
-            if (error) {
-                errors.push(`${file.name}: ${error}`);
-            } else {
-                validFiles.push(file);
-            }
-        });
-        rejectedFiles.forEach(rejection => {
-            const { file, errors: dropzoneErrors } = rejection;
-
-            if (dropzoneErrors.some(e => e.code === 'file-invalid-type')) {
-                const supportedTypes = strategyManager.getSupportedExtensions();
-                errors.push(`${file.name}: File type not supported. Only ${supportedTypes} allowed`);
-            } else {
-                errors.push(`${file.name}: ${dropzoneErrors[0]?.message ?? 'Upload failed'}`);
-            }
-        });
-        errors.forEach(err => toast.error(err, { duration: 4000 }));
-
-        onDrop(validFiles);
-
-    };
+/**
+ * react-dropzone handles:
+ * 1. Drag & drop events
+ * 2. File input click
+ * 3. Shallow MIME type validation (via `accept` prop)
+ * 
+ * We pass ALL files to parent — validation happens there.
+*/
+export const Dropzone = ({
+    onDrop,
+    acceptedTypes,
+    supportedTypesLabel
+}: Props) => {
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
-        onDrop: handleDrop,
+        onDrop,
         multiple: true,
-        accept: resolvedAcceptedTypes,
+        accept: acceptedTypes,
     });
 
     return (

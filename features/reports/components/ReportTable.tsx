@@ -14,6 +14,11 @@ interface ReportTableProps {
     classNames?: string;
 }
 
+/**
+  *  Define las columnas que presentan una vista integral de informes con tipo, fecha, nombre_informe 
+  *   eficiente paginacion SSR 
+  *   es llenada por el componente ReportPage {@link ReportPage}
+ */
 const ReportTable = ({ title, reports, classNames }: ReportTableProps) => {
     const router = useRouter();
     // Memoized expensive calculations

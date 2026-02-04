@@ -109,3 +109,10 @@ interface DataTableProps<T> {
   bodyRowClassName?: string;
   enableKeyboardNav?: boolean;
 }
+
+type ReportOperation = {
+  id: string;
+  type: 'ADD' | 'UPDATE' | 'REMOVE';
+  status: UploadStatus;
+  timestamp: number;
+};

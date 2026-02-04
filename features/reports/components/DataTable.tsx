@@ -7,8 +7,11 @@ import {
     TableRow,
 } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
-
-const DataTable = <T,>({
+/* 
+    Totalmente reutilizable
+    Itera sobre QUÉ renderizar
+ */
+const DataTable = <T,>({ //puede ser cuarquier tipo
     columns,
     data,
     rowKey,

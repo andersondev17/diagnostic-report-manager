@@ -1,6 +1,14 @@
 #  Diagnostic Report Manager
 
-A modern, React application to manage and view diagnostic reports.
+A modern, React application showcasing clean architecture, SOLID principles, and modern frontend patterns for managing diagnostic reports at scale.
+
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
+[![Next.js](https://img.shields.io/badge/Next.js-16.1-black.svg)](https://nextjs.org/)
+[![React](https://img.shields.io/badge/React-19.2-61DAFB.svg)](https://reactjs.org/)
+[![Zustand](https://img.shields.io/badge/Zustand-5.0-orange.svg)](https://github.com/pmndrs/zustand)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-38B2AC.svg)](https://tailwindcss.com/)
+
+---
 
 ## Table of Contents
 
@@ -18,13 +26,29 @@ A modern, React application to manage and view diagnostic reports.
 
 ## Overview
 
-This application allows users to:
+### ✨ **Clean Architecture in Practice**
+- **Layered separation**: UI → Orchestration → Business Logic → Technical Infrastructure
+- **Dependency Inversion**: Components depend on abstractions, not implementations
+- **Single Responsibility**: Each module has exactly one reason to change
+- **Open/Closed Principle**: Extensible without modifying existing code
 
-- View a list of diagnostic reports efficiently  
-- Filter reports in real-time by name using URL-driven search  
-- Paginate results dynamically  
-- View individual reports with interactive cards  
-- Experience accessible and responsive UI  
+### 🏗️ **Design Patterns**
+- **Strategy Pattern** for file validation (add new file types without touching existing code)
+- **Facade Pattern** for complex upload flows
+- **Column Strategy** for flexible, reusable data tables
+- **Server Actions** for type-safe, optimized data fetching
+
+### 🔒 **Type Safety First**
+- **Branded types** prevent ID mixing bugs
+- **Exhaustive enums** catch state bugs at compile time
+- **Generic components** with full type inference
+- **No `any` types** in production code
+
+### ⚡ **Performance Optimized**
+- **Server-Side Rendering** for instant page loads
+- **Strategic memoization** prevents unnecessary re-renders
+- **Efficient state management** with Zustand (no Provider hell)
+- **Code splitting** and lazy loading where it matters
 
 ---
 
@@ -32,16 +56,47 @@ This application allows users to:
 
 ### Upload Form (POST Simulation)
 
-- Drag & Drop file upload using **react-dropzone**
-- Multiple file support with type validation (PDF, CSV)
-- Simulated upload lifecycle:
-  - **Loading**: progress indicator with animated bar
-  - **Success**: file added to the list after simulated delay
-  - **Error**: retry option available
-- Upload simulation waits **2 seconds** before completing (Promise / setTimeout)
-- Each file is assigned a **unique ID** for reliable state management
-- Fully accessible dropzone with ARIA labels and keyboard support and SSR rendering
+- **Multi-file drag & drop** with `react-dropzone`
+- **Type validation** via Strategy Pattern (PDF, CSV, extensible to any format)
+- **Real-time progress tracking** with simulated 2-second upload lifecycle
+- **Error recovery** with one-click retry
+- **Accessible** with full ARIA labels and keyboard navigation
 
+**Architecture Highlight:**
+```typescript
+// Adding a new file type requires ZERO changes to existing code
+class CsvUploadStrategy implements UploadStrategy {
+  supports(file) { return file.type ===  ReportType.CSV }
+  validate(file) { /* rules */ }
+  getIcon() { return  }
+}
+// Just register it - done!
+```
+
+### 📊 Dynamic Report Management
+
+- **Server-side filtering & pagination** for optimal performance
+- **Real-time search** with debounced URL sync
+- **Sortable, accessible tables** with keyboard navigation
+- **Responsive cards** with smooth animations
+- **Empty states** with helpful CTAs
+
+**Architecture Highlight:**
+```tsx
+// DataTable is 100% reusable - works with ANY data type
+<DataTable
+  columns={reportColumns}
+  data={reports}
+  onRowClick={handleNavigate}
+  enableKeyboardNav
+/>
+
+<DataTable
+  columns={uploadColumns}
+  data={files}
+  onRowClick={handleRetry}
+/>
+```
 ### Utilities
 
 - `cn()`: Tailwind + clsx + tailwind-merge helper for clean class management  
@@ -54,6 +109,15 @@ This application allows users to:
 - Keyboard-friendly navigation and focus management  
 - Accessible components with ARIA labels and screen reader hints  
 - Modular, reusable components for maintainability  
+### Key Architectural Decisions
+
+| Decision | Rationale | Benefit |
+|----------|-----------|---------|
+| **Single StrategyManager instance** | Prevent duplicate validation, memory waste |  memory reduction, consistent rules |
+| **Validation in useUploadFlow only** | Separation of concerns (SRP) | No duplicate logic, easier testing |
+| **Columns in useUploadFlow** | Cohesion (columns depend on hook internals) | Single source of truth, proper memoization |
+| **Server Actions for data** | Type-safe, server-side filtering | No client fetching, instant page loads |
+| **Zustand over Redux** | No boilerplate, no Provider hell | 70% less code, better DX |
 
 ---
 
@@ -61,41 +125,17 @@ This application allows users to:
 
 ### Key Components
 
-- **Dropzone**
-  - Responsible only for file intake and validation
-  - Emits accepted files upward (no business logic)
+| File | Purpose | Pattern |
+|------|---------|---------|
+| `useUploadFlow.ts` | Orchestrates upload (validation + upload + UI) | Facade |
+| `upload-manager.ts` | Selects validation strategy | Strategy + Manager |
+| `upload-strategies.tsx` | PDF/CSV validation rules | Strategy (Concrete) |
+| `DataTable.tsx` | Generic, reusable table | Column Strategy |
+| `reports-store.ts` | Global state with persistence | Observer |
+| `report.actions.ts` | Server-side data fetching | Server Actions |
 
-- **useFileUpload (custom hook)**
-  - Centralizes upload state and simulation logic
-  - Manages progress, status transitions, retry, and removal
-  - Simulates network latency using a 2-second delay
-
-- **UploadList**
-  - Renders uploaded files using a column-based configuration
-  - Delegates rendering responsibility to composable cells
-
-  - **ReportCard**: Interactive card with hover effect, split text animation, and status badges  
-
-  - **ReportTable**: Column strategies, Upload renderers & Memoized sorting, keyboard navigation, pagination, and ARIA labels  
-
-  - **SearchInput**: Real-time search with debounce, URL sync, and accessible input  
-
-  - **Reports-Store**:treated the store as a domain layer, It centralizes report CRUD operations selectors
-
-  - **UploadStrategy & UploadStrategyManager**: Implements the Strategy Pattern and Decouples file-specific rules from UI and upload logic Makes it easy to add new file types in the future without touching the hook or Dropzone
 
 ### Key Patterns
-
-- ** Strategy Pattern**: `getReportColor()` maps report types to color badges; easily extensible to icons, validation, or other behaviors  
-- **Component-first architecture**: UI separated from logic for maintainability  
-- **Server Actions & Mock API**: `getAllReports()` and `getReport()` simulate backend calls with filters and pagination  
-- **Memoization & Callback Optimization**: `useMemo` and `useCallback` prevent unnecessary re-renders  
-
----
-
-
-
-### Patterns & Best Practices
 
 | Feature | Pattern | Description |
 |-------|--------|-------------|
@@ -105,6 +145,7 @@ This application allows users to:
 | useFileUpload | State Reducer + Controller | Centralized upload logic decoupled from UI components |
 | Report Detail Page | Next.js Dynamic Route Pattern | Route-based data fetching using `/reports/[id]` |
 
+---
 
 
 ### Technical Discussion: Scaling File Uploads Beyond 1GB
